@@ -27,7 +27,6 @@ jobs:
           cp -r features "$INNER_FOLDER_NAME/"
           cp -r util "$INNER_FOLDER_NAME/"
           cp config.js "$INNER_FOLDER_NAME/"
-          cp data.json "$INNER_FOLDER_NAME/"
           cp index.js "$INNER_FOLDER_NAME/"
           cp metadata.json "$INNER_FOLDER_NAME/"
 
