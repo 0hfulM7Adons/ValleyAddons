@@ -16,8 +16,8 @@ jobs:
       - name: Package CT Module
         run: |
           VERSION=$(jq -r '.version' metadata.json)
-          OUTER_ZIP_NAME="SavageESP-${VERSION}"
-          INNER_FOLDER_NAME="SavageESP"
+          OUTER_ZIP_NAME="ValleyAddons-${VERSION}"
+          INNER_FOLDER_NAME="ValleyAddons"
 
           mkdir -p "$INNER_FOLDER_NAME"
 
@@ -36,4 +36,4 @@ jobs:
       - name: Upload ZIP to release
         uses: softprops/action-gh-release@v1
         with:
-          files: "SavageESP-*.zip"
+          files: "ValleyAddons-*.zip"
