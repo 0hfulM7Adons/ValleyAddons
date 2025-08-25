@@ -26,7 +26,7 @@ register("chat", () => {
         }
     }
     dupeClass = false
-}).setCriteria(/Starting in \d second/)
+}).setCriteria(/^Starting in \d second(s)?\./)
 
 registerWhen(register("renderOverlay", () => {
     text.draw(Renderer.screen.getWidth() / 2, Renderer.screen.getHeight() / 2)
