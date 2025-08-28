@@ -1,7 +1,7 @@
 import config from "../config"
 import { EntityItem, RenderUtils, ColorUtils, AxisAlignedBB, javaColor, START_MSG } from "../util/util"
 
-const secrets = new Set(["Revive Stone", "Trap", "Decoy", "Inflatable Jerry", "Defuse Kit", "Dungeon Chest Key", "Treasure Talisman", "Architect's First Draft", "Spirit Leap", "Healing VIII Splash Potion", "Training Weights"])
+const secrets = new Set(["Revive Stone", "Trap", "Decoy", "Inflatable Jerry", "Defuse Kit", "Dungeon Chest Key", "Treasure Talisman", "Architect's First Draft", "Spirit Leap", "Healing VIII Splash Potion", "Training Weights", "Candycomb"])
 
 register("chat", () => {
 
