@@ -2,7 +2,7 @@
     "name": "Valley Addons",
     "creator": "ohful",
     "description": "Sigmy",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "entry": "index.js",
     "requires": [
       "PogData",
