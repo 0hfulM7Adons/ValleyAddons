@@ -1,4 +1,5 @@
 import config from "../config"
+import { getClassByName } from "../util/util"
 import { data } from "../util/data"
 import { registerWhen } from "../../BloomCore/utils/Utils"
 
@@ -81,7 +82,10 @@ register("worldLoad", () => {
 
 registerWhen(register("renderOverlay", () => {
     if (!melodyProgress || !inP3) return
-    const displayMessage = `&d${playerName} has Melody! ${melodyProgress}`
+    let name;
+    if (config.melodyClass) name = getClassByName(playerName);
+    else name = playerName;
+    let displayMessage = `&5&l${name} &r&dhas Melody! ${melodyProgress}`
 
     text.setString(displayMessage);
     text.setScale(data.melodyWarning.scale)

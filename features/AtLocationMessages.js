@@ -16,15 +16,15 @@ register("chat", (n, a, p) => {
     startTime = Date.now()
     timesPlayed = 0
 
-    if (p.toLowerCase() == "ss") messagesSent.ss[0] = true
-    if (p.toLowerCase() == "ee2") messagesSent.ee2[0] = true
-    if (p.toLowerCase() == "high ee2") messagesSent.highee2[0] = true
-    if (p.toLowerCase() == "ee3") messagesSent.ee3[0] = true
-    if (p.toLowerCase() == "core") messagesSent.core[0] = true
-    if (p.toLowerCase() == "goldor tunnel") messagesSent.tunnel[0] = true
-    if (p.toLowerCase() == "2 safespot") messagesSent.safespot2[0] = true
-    if (p.toLowerCase() == "3 safespot") messagesSent.safespot3[0] = true
-}).setCriteria(/Party >.* (\w+): (At|Inside) (.+)(!)?/)
+    if (p.toLowerCase().includes("ss")) messagesSent.ss[0] = true
+    if (p.toLowerCase().includes("ee2")) messagesSent.ee2[0] = true
+    if (p.toLowerCase().includes("high ee2")) messagesSent.highee2[0] = true
+    if (p.toLowerCase().includes("ee3")) messagesSent.ee3[0] = true
+    if (p.toLowerCase().includes("core")) messagesSent.core[0] = true
+    if (p.toLowerCase().includes("goldor tunnel")) messagesSent.tunnel[0] = true
+    if (p.toLowerCase().includes("2 safespot")) messagesSent.safespot2[0] = true
+    if (p.toLowerCase().includes("3 safespot")) messagesSent.safespot3[0] = true
+}).setCriteria(/Party >.* (\w+): (At|Inside) (.+)/)
 
 registerWhen(register("renderOverlay", () => {
     const remaining = (1500 - (Date.now() - startTime ?? 0))

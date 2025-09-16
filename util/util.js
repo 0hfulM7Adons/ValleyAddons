@@ -17,6 +17,8 @@ export const Vec3 = Java.type("net.minecraft.util.Vec3")
 
 export const START_MSG = "[NPC] Mort: Here, I found this map when I first entered the dungeon.";
 
+export const removeUnicode = (string) => typeof(string) !== "string" ? "" : string.replace(/[^\u0000-\u007F]/g, "")
+
 export function getDistance(x1, z1, x2, z2) {
     return Math.sqrt((x1 - x2) ** 2 + (z1 - z2) ** 2)
 }
@@ -42,6 +44,16 @@ export function getClass() {
     let match = TabList?.getNames()[index]?.removeFormatting()?.match(/.+ \((.+) .+\)/)
     if (!match) return "EMPTY"
     return match[1];
+}
+
+export function getClassByName(playerName) {
+    let index = TabList?.getNames()?.findIndex(line => line?.toLowerCase()?.includes(playerName?.toLowerCase()));
+    if (index == -1) return;
+    
+    let match = TabList?.getNames()[index]?.removeFormatting().match(/(?:\[\d+\]\s*)?(.+?) \((\w+)/);
+    if (!match) return "EMPTY";
+    
+    return removeUnicode(match[2]).trim(); 
 }
 
 export function isPlayerInBox(x1, x2, y1, y2, z1, z2) {

@@ -12,14 +12,14 @@ export let roomsJson = JSON.parse(FileLib.read("ValleyAddons", "components/rooms
 export const RoomMap = new Map(roomsJson.map(a => [a.roomID, a]))
 
 // Fetch the rooms.json file from the github repo in case rooms were added or modified
-request({url: "https://raw.githubusercontent.com/UnclaimedBloom6/IllegalMap/main/IllegalMap/utils/rooms.json", json: true}).then(data => {
-    roomsJson = data
-    RoomMap.clear()
-    for (let roomData of roomsJson) {
-        RoomMap.set(roomData.roomID, roomData)
-    }
-    FileLib.write("Valley Addons", "components/rooms.json", JSON.stringify(roomsJson, null, 4))
-})
+// request({url: "https://raw.githubusercontent.com/UnclaimedBloom6/IllegalMap/main/IllegalMap/utils/rooms.json", json: true}).then(data => {
+//     roomsJson = data
+//     RoomMap.clear()
+//     for (let roomData of roomsJson) {
+//         RoomMap.set(roomData.roomID, roomData)
+//     }
+//     FileLib.write("ValleyAddons", "components/rooms.json", JSON.stringify(roomsJson, null, 4))
+// })
 
 /**
  * Starting from the map position, finds the coordinate to get to the x/y on the map. Eg 0, 0 would

@@ -3,43 +3,57 @@ import { data } from "../util/data"
 import { S32PacketConfirmTransaction } from "../util/util"
 import { registerWhen } from "../../BloomCore/utils/Utils"
 
-let ticks = 0
-let timeText = new Text('').setScale(2).setShadow(true).setAlign('CENTER').setColor(Renderer.GOLD)
-let isTimerActive = false
+let ticks = 0;
+let deathTime = 0;
+let timeText = new Text('').setScale(2).setShadow(true).setAlign('CENTER').setColor(Renderer.GOLD);
+let deathText = new Text('').setScale(2).setShadow(true).setAlign('CENTER').setColor(Renderer.DARK_PURPLE);
 
 register("chat", () => {
-    ticks = config.totalStormTime ? 0 : 20
+    if (!config.padTickTimer) return;
+    ticks = 0
     tickCounter.register()
-    isTimerActive = true
+    timer.register();
 }).setCriteria("[BOSS] Storm: Pathetic Maxor, just like expected.")
 
 register("chat", () => {
     ticks = 0
     tickCounter.unregister()
-    isTimerActive = false
+    timer.unregister();
 }).setCriteria("[BOSS] Storm: I should have known that I stood no chance.")
 
-registerWhen(register("renderOverlay", () => {
+register("chat", () => {
+    if (!config.stormDeathTime) return;
+    deathTime = ticks;
+    ChatLib.chat(`${config.customPrefix} &aStorm died at &e${(ticks / 20).toFixed(2)}s&a.`)
+    timeDisplay.register();
+    setTimeout(() => {
+        timeDisplay.unregister();
+    }, 2000)
+}).setCriteria("⚠ Storm is enraged! ⚠")
+
+const timer = register("renderOverlay", () => {
     let timeLeft = ticks / 20
     timeText.setString(timeLeft.toFixed(2))
     timeText.setScale(data.padTickTimer.scale)
     timeText.draw(data.padTickTimer.x, data.padTickTimer.y)
-}), () => config.padTickTimer && isTimerActive)
+}).unregister();
+
+const timeDisplay = register("renderOverlay", () => {
+    let text = (deathTime / 20).toFixed(2);
+    deathText.setString(text);
+    deathText.setScale(data.padTickTimer.scale);
+    deathText.draw(data.padTickTimer.x, data.padtickTimer.y + 40 * data.padTickTimer.scale);
+}).unregister();
 
 const tickCounter = register("packetReceived", () => {
-    if (!config.totalStormTime) {
-        ticks--
-        if (ticks <= 0) ticks = 20
-    } else {
-        ticks++
-    }
+    ticks++;
 }).setFilteredClass(S32PacketConfirmTransaction).unregister()
 
-registerWhen(register("worldUnload", () => {
-    ticks = 0
-    tickCounter.unregister()
-    isTimerActive = false
-}), () => config.padTickTimer)
+register("worldUnload", () => {
+    ticks = 0;
+    tickCounter.unregister();
+    timer.unregister();
+})
 
 registerWhen(register("renderOverlay", () => {
     timeText.setString("1.00")

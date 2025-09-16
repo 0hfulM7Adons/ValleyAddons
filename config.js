@@ -12,7 +12,7 @@ import {
     @NumberProperty,
 } from '../Vigilance/index';
 
-@Vigilant("ValleyAddons", "§5Valley Addons (1.0.0)",  {
+@Vigilant("ValleyAddons", "§5Valley Addons",  {
     getCategoryComparator: () => (a, b) => {
         const categories = ['General', 'Auto Refill', 'Dungeons', 'Run Splits', 'Blood', 'Phase 1', 'Phase 2', 'Phase 3', 'Phase 5', 'Location Messages'];
         return categories.indexOf(a.name) - categories.indexOf(b.name);
@@ -650,12 +650,12 @@ class Settings {
     padTickTimer = false;
 
     @SwitchProperty({
-        name: "Show Total Storm Time",
-        description: "Shows the storm time counting up instead of counting down from 1 second",
+        name: "First Crush Death Time",
+        description: "Sends the time storm gets enraged after the first crush",
         category: "Phase 2",
         subcategory: "Pad"
     })
-    totalStormTime = false;
+    stormDeathTime = false;
 
     @ButtonProperty({
         name: "Move Pad Tick Timer",
@@ -754,6 +754,14 @@ class Settings {
         subcategory: "Melody"
     })
     melodyWarning = false;
+
+    @SwitchProperty({
+        name: "Show class instead of name",
+        description: "Shows the class in bold text instead of the player's name",
+        category: "Phase 3",
+        subcategory: "Melody"
+    })
+    melodyClass = false;
 
     @ButtonProperty({
         name: "Move Melody Warning",
