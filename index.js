@@ -3,6 +3,7 @@ import { rotate } from "./commands/Rotate"
 import { sound } from "./commands/SoundCommand"
 import { valleyCommand } from "./commands/ValleyCommand"
 import { pb } from "./commands/PbCommand"
+import { leapOrder } from "./commands/LeapOrder"
 
 import "./features/AtLocationMessages"
 import "./features/AutoOpenPotionBag"

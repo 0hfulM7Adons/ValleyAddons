@@ -42,7 +42,7 @@ const timeDisplay = register("renderOverlay", () => {
     let text = (deathTime / 20).toFixed(2);
     deathText.setString(text);
     deathText.setScale(data.padTickTimer.scale);
-    deathText.draw(data.padTickTimer.x, data.padtickTimer.y + 40 * data.padTickTimer.scale);
+    deathText.draw(data.padTickTimer.x, data.padTickTimer.y + 15 * data.padTickTimer.scale);
 }).unregister();
 
 const tickCounter = register("packetReceived", () => {
