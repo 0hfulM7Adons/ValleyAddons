@@ -1,72 +1,95 @@
 import config from "../config"
 import { data } from "../util/data"
-import { S32PacketConfirmTransaction } from "../util/util"
+import { S32PacketConfirmTransaction, C09PacketHeldItemChange } from "../util/util"
 import { registerWhen } from "../../BloomCore/utils/Utils"
 
-let text = new Text("").setScale(1).setShadow(true).setAlign("CENTER").setColor(Renderer.YELLOW)
-let ticks = 0
-let soundPlayed = false
-let casted = false
+let text = new Text("").setScale(1).setShadow(true).setAlign("CENTER").setColor(Renderer.YELLOW);
+let ticks = 0;
+let soundPlayed = false;
+let casted = false;
 
-register("packetReceived", () => {
-    if (ticks <= 0) return
-    ticks--
+const tickChecker = register("packetReceived", () => {
+    if (--ticks <= 0) {
+        tickChecker.unregister();
+        display.unregister();
+        return;
+    }
     if (ticks < 140) {
-        casted = false
-        soundPlayed = false
+        casted = false;
+        soundPlayed = false;
     }
-}).setFilteredClass(S32PacketConfirmTransaction)
+}).setFilteredClass(S32PacketConfirmTransaction).unregister();
 
-register("soundPlay", () => {
-    soundPlayed = true
-}).setCriteria("mob.wolf.howl")
+const soundListener = register("soundPlay", () => {
+    soundPlayed = true;
+}).setCriteria("mob.wolf.howl").unregister();
 
-registerWhen(register("actionBar", (event) => {
-    let msg = ChatLib.getChatMessage(event).removeFormatting()
+const actionBarListener = register("actionBar", (event) => {
+    let msg = ChatLib.getChatMessage(event).removeFormatting();
     if (msg.includes("CASTING") && !msg.includes("CASTING IN") && !casted) {
-        casted = true
-        ticks = 200
+        casted = true;
+        ticks = 200;
+        tickChecker.register();
+        display.register();
     }
-}), () => config.ragDisplay)
+}).unregister();
+
+register("packetSent", (packet) => {
+    if (Player?.getHeldItem()?.getName()?.includes("Ragnarock")) {
+        soundListener.register();
+        actionBarListener.register();
+    } else {
+        soundListener.unregister();
+        actionBarListener.unregister();
+    }
+}).setFilteredClass(C09PacketHeldItemChange)
 
 register("worldLoad", () => {
-    ticks = 0
-    soundPlayed = false
-    casted = false
+    ticks = 0;
+    soundPlayed = false;
+    casted = false;
+    soundListener.unregister();
+    actionBarListener.unregister();
+    tickChecker.unregister();
 })
 
-registerWhen(register("renderOverlay", () => {
-    const remaining = (ticks / 20).toFixed(2)
+const display = register("renderOverlay", () => {
+    const remaining = (ticks / 20).toFixed(2);
 
-    text.setString(remaining)
-    text.setScale(data.ragDisplay.scale)
-    text.draw(data.ragDisplay.x, data.ragDisplay.y)
-}), () => config.ragDisplay && ticks > 0)
+    text.setString(remaining);
+    text.setScale(data.ragDisplay.scale);
+    text.draw(data.ragDisplay.x, data.ragDisplay.y);
+}).unregister();
 
-registerWhen(register("renderOverlay", () => {
-    text.setString("10.00")
-    text.setScale(data.ragDisplay.scale)
-    text.draw(data.ragDisplay.x, data.ragDisplay.y)
-}), () => config.ragDisplayGui.isOpen())
+const exampleHud = register("renderOverlay", () => {
+    text.setString("10.00");
+    text.setScale(data.ragDisplay.scale);
+    text.draw(data.ragDisplay.x, data.ragDisplay.y);
+}).unregister();
 
 registerWhen(register("dragged", (dx, dy, x, y, bn) => {
-    if (bn == 2) return
-    data.ragDisplay.x = x
-    data.ragDisplay.y = y
-    data.save()
+    const checkClose = register("GuiClosed", () => {
+        checkClose.unregister();
+        exampleHud.unregister();
+    })
+    exampleHud.register();
+    if (bn == 2) return;
+    data.ragDisplay.x = x;
+    data.ragDisplay.y = y;
+    data.save();
 }), () => config.ragDisplayGui.isOpen())
 
 register("scrolled", (x, y, dir) => {
-    if (!config.ragDisplayGui.isOpen()) return
-    if (dir == 1) data.ragDisplay.scale += 0.05
-    else data.ragDisplay.scale -= 0.05
-    data.save()
+    if (!config.ragDisplayGui.isOpen()) return;
+    if (dir == 1) data.ragDisplay.scale += 0.05;
+    else data.ragDisplay.scale -= 0.05;
+    data.save();
 })
 
 register("guiMouseClick", (x, y, bn) => {
-    if (!config.ragDisplayGui.isOpen() || bn != 2) return
-    data.ragDisplay.x = Renderer.screen.getWidth() / 2
-    data.ragDisplay.y = Renderer.screen.getHeight() / 2 - 20
-    data.ragDisplay.scale = 1
-    data.save()
+    if (!config.ragDisplayGui.isOpen() || bn != 2) return;
+    data.ragDisplay.x = Renderer.screen.getWidth() / 2;
+    data.ragDisplay.y = Renderer.screen.getHeight() / 2 - 20;
+    data.ragDisplay.scale = 1;
+    data.save();
 })

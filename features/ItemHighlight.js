@@ -1,23 +1,23 @@
 import config from "../config"
-import { EntityItem, RenderUtils, ColorUtils, AxisAlignedBB, javaColor, START_MSG } from "../util/util"
+import { EntityItem, RenderUtils, ColorUtils, AxisAlignedBB, javaColor, START_MSG, bossMessages } from "../util/util"
 
 const secrets = new Set(["Revive Stone", "Trap", "Decoy", "Inflatable Jerry", "Defuse Kit", "Dungeon Chest Key", "Treasure Talisman", "Architect's First Draft", "Spirit Leap", "Healing VIII Splash Potion", "Training Weights", "Candycomb"])
 
 register("chat", () => {
 
+	if (!config.itemHighlight) return;
 	itemRender.register();
 
 }).setCriteria(START_MSG)
 
-register("worldLoad", () => {
+register("chat", (message) => {
 
+	if (!bossMessages.includes(message)) return;
 	itemRender.unregister();
 
-})
+}).setCriteria("${message}")
 
 const itemRender = register("renderEntity", (entity, pos, partialTick, event) => {
-
-	if (!config.itemHighlight) return;
 	
 	const d = entity.distanceTo(Player.getPlayer())
 	if (d >= 20) return
@@ -46,6 +46,6 @@ const itemRender = register("renderEntity", (entity, pos, partialTick, event) =>
 	const newBox = new AxisAlignedBB(x - w / 2, y, z - w / 2, x + w / 2, y + h, z + w / 2)
 	RenderUtils.INSTANCE.drawFilledAABB(newBox, fillColor, false)
 	
-	cancel(event)
+	cancel(event);
 
 }).setFilteredClass(EntityItem.class).unregister()

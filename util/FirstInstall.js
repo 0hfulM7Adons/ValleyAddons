@@ -18,6 +18,6 @@ const checkFirstInstall = () => {
 }
 
 const firstInstallTrigger = register("tick", () => {
-    checkFirstInstall()
-    firstInstallTrigger.unregister()
+    checkFirstInstall();
+    firstInstallTrigger.unregister();
 })

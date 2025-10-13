@@ -1,73 +1,80 @@
 import config from "../config"
-import { registerWhen } from "../../BloomCore/utils/Utils"
-import Dungeon from "../../BloomCore/dungeons/Dungeon"
-import { getClass, ArmorStand } from "../util/util"
+import { getClass, ArmorStand, START_MSG } from "../util/util"
 
-let witherDropped = false
-let bloodDropped = false
-let wither = new Text("&8&lWither Key Dropped").setScale(2).setShadow(true)
-let blood = new Text("&4&lBlood Key Dropped").setScale(2).setShadow(true)
+let wither = new Text("&8&lWither Key Dropped").setScale(2).setShadow(true);
+let blood = new Text("&4&lBlood Key Dropped").setScale(2).setShadow(true);
+let witherDropped = false;
+let bloodDropped = false;
 
 register("worldLoad", () => {
-    bloodOpened = false
-    witherDropped = false
-    bloodDropped = false
+    witherDisplay.unregister();
+    bloodDisplay.unregister();
+    tickListener.unregister();
 })
 
 register("chat", () => {
-    bloodOpened = true
+    if (!config.witherBloodKeys) return;
+    tickListener.register();
+}).setCriteria(START_MSG)
+
+register("chat", () => {
+    tickListener.unregister();
 }).setCriteria(/\[BOSS\] The Watcher: .+/)
 
-register("tick", () => {
-    if (!config.witherBloodKeys) return
-    if (!Dungeon.inDungeon) return
-    if (getClass() != "Archer" && getClass() != "Mage") return
+const tickListener = register("tick", () => {
+    if (getClass() != "Archer" && getClass() != "Mage") return;
     
-    const entities = World.getAllEntitiesOfType(ArmorStand)
+    const entities = World.getAllEntitiesOfType(ArmorStand);
     for (let i = 0; i < entities.length; ++i) {
-        let entity = entities[i]
+        let entity = entities[i];
         if (entity.getName().includes("Wither Key")) {
+            witherDisplay.register();
             if (!witherDropped) {
-                witherDropped = true
-                World.playSound("random.orb", 2, 0.5)
+                World.playSound("random.orb", 2, 0.5);
+                witherDropped = true;
             }
         } else if (entity.getName().includes("Blood Key")) {
+            bloodDisplay.register();
             if (!bloodDropped) {
-                bloodDropped = true
-                World.playSound("random.orb", 2, 0.5)
+                World.playSound("random.orb", 2, 0.5);
+                bloodDropped = true;
             }
         }
     }
-})
+}).unregister();
 
-registerWhen(register("renderOverlay", () => {
+const witherDisplay = register("renderOverlay", () => {
     wither.draw((Renderer.screen.getWidth() - wither.getWidth()) / 2, (Renderer.screen.getHeight() - wither.getHeight()) / 2 - 50)
-}), () => witherDropped)
+}).unregister();
 
-registerWhen(register("renderOverlay", () => {
+const bloodDisplay = register("renderOverlay", () => {
     blood.draw((Renderer.screen.getWidth() - blood.getWidth()) / 2, (Renderer.screen.getHeight() - blood.getHeight()) / 2 - 50)
-}), () => bloodDropped)
+}).unregister();
 
 register("chat", () => {
     setTimeout(() => {
-        witherDropped = false
+        witherDisplay.unregister();
+        witherDropped = false;
     }, 500)
 }).setCriteria("has obtained Wither Key!").setContains()
 
 register("chat", () => {
     setTimeout(() => {
-        witherDropped = false
+        witherDisplay.unregister();
+        witherDropped = false;
     }, 500)
 }).setCriteria("A Wither Key was picked up!")
 
 register("chat", () => {
     setTimeout(() => {
-        bloodDropped = false
+        bloodDisplay.unregister();
+        bloodDropped = false;
     }, 500)
 }).setCriteria("has obtained Blood Key!").setContains()
 
 register("chat", () => {
     setTimeout(() => {
-        bloodDropped = false
+        bloodDisplay.unregister();
+        bloodDropped = false;
     }, 500)
 }).setCriteria("A Blood Key was picked up!")

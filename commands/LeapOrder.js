@@ -9,12 +9,18 @@ T: A B H M
 H: A B M T
 */
 
+let customOrder = false;
+
+export function isCustomOrder() {
+    return customOrder;
+}
+
 let players = [];
 let classes = [];
 
 export const leapOrder = register("command", (...args) => {
     if (!args[0]) return ChatLib.chat(`${config.customPrefix} &cPlease enter the username of the second mage.`)
-    let healer = args[0].toLowerCase();
+    let healerArg = args[0].toLowerCase();
 
     let odOrder = false;
     if (args[1] == "od") odOrder = true;
@@ -38,6 +44,9 @@ export const leapOrder = register("command", (...args) => {
         players.push(name.toLowerCase());
     }
 
+    let healer = players.find(p => p.toLowerCase().startsWith(healerArg));
+    if (!healer) return ChatLib.chat(`${config.customPrefix} &cNo username found that starts with &e${healerArg}`);
+
     setHealer(healer);
 
     // Check map size
@@ -48,8 +57,10 @@ export const leapOrder = register("command", (...args) => {
     let order = odOrder ? getOdOrder(getOwnClass()) : getOrder(getOwnClass());
     let namesOrder = getNamesOrder(order);
 
-    ChatLib.chat(`${config.customPrefix} &aRunning command: &e/od leaporder ${namesOrder[0]} ${namesOrder[1]} ${namesOrder[2]} ${namesOrder[3]}`)
-    ChatLib.command(`od leaporder ${namesOrder[0]} ${namesOrder[1]} ${namesOrder[2]} ${namesOrder[3]}`, true)
+    ChatLib.chat(`${config.customPrefix} &aRunning command: &e/od leaporder ${namesOrder[0]} ${namesOrder[1]} ${namesOrder[2]} ${namesOrder[3]}`);
+    ChatLib.command(`od leaporder ${namesOrder[0]} ${namesOrder[1]} ${namesOrder[2]} ${namesOrder[3]}`, true);
+    ChatLib.chat(`${config.customPrefix} &aDupe class checker will now ignore dupe mage for the rest of the session.`)
+    customOrder = true;
 }).setName("leaporder").setAliases(["lo"])
 
 function setHealer(name) {
@@ -70,7 +81,7 @@ function checkClasses(arr) {
 }
 
 function getOwnClass() {
-    let ind = players.indexOf(Player.getName());
+    let ind = players.indexOf(Player.getName().toLowerCase());
     if (ind < 0) return ChatLib.chat(`${config.customPrefix} &cCould not find own class.`);
     return classes[ind];
 }

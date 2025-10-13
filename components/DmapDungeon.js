@@ -35,16 +35,16 @@ export default new class DmapDungeon {
         }).setFps(1)
 
         // Singleplayer debug stuff
-        let lastRoom = null
-        register("tick", () => {
-            if (!Client.getMinecraft().func_71356_B() || !Dungeon.inDungeon) return
-            let room = this.getCurrentRoom()
-            if (room == lastRoom) return
-            if (lastRoom) this.playerRoomExitListeners.forEach(f => f(null, lastRoom))
-            lastRoom = room
-            if (!room) return
-            this.playerRoomEnterListeners.forEach(f => f(null, room))
-        })
+        // let lastRoom = null
+        // register("tick", () => {
+        //     if (!Client.getMinecraft().func_71356_B() || !Dungeon.inDungeon) return
+        //     let room = this.getCurrentRoom()
+        //     if (room == lastRoom) return
+        //     if (lastRoom) this.playerRoomExitListeners.forEach(f => f(null, lastRoom))
+        //     lastRoom = room
+        //     if (!room) return
+        //     this.playerRoomEnterListeners.forEach(f => f(null, room))
+        // })
 
         Dungeon.onMapData((mapData) => {
             // Check for checkmarks, new rooms etc
@@ -69,41 +69,41 @@ export default new class DmapDungeon {
             }
         })
 
-        register("tick", () => {
-            if (!Dungeon.inDungeon) return
-            this.dungeonMap.checkDoorsOpened()
-        })
+        // register("tick", () => {
+        //     if (!Dungeon.inDungeon) return
+        //     this.dungeonMap.checkDoorsOpened()
+        // })
 
-        register("step", () => {
-            if ((!Dungeon.inDungeon)) return
+        // register("step", () => {
+        //     if ((!Dungeon.inDungeon)) return
 
-            let secretsForMax = Math.ceil(this.dungeonMap.secrets * Dungeon.secretsPercentNeeded)
-            let ms = Math.ceil(secretsForMax*((40 - (Dungeon.isPaul ? 10 : 0) - (Dungeon.mimicKilled ? 2 : 0) - (Dungeon.crypts > 5 ? 5 : Dungeon.crypts) + (Dungeon.deathPenalty))/40))
+        //     let secretsForMax = Math.ceil(this.dungeonMap.secrets * Dungeon.secretsPercentNeeded)
+        //     let ms = Math.ceil(secretsForMax*((40 - (Dungeon.isPaul ? 10 : 0) - (Dungeon.mimicKilled ? 2 : 0) - (Dungeon.crypts > 5 ? 5 : Dungeon.crypts) + (Dungeon.deathPenalty))/40))
 
-            let totalSecrets = Dungeon.totalSecrets || this.dungeonMap.secrets
+        //     let totalSecrets = Dungeon.totalSecrets || this.dungeonMap.secrets
 
-            this.mapLine1 = ``
-            this.mapLine2 = ``
-        }).setFps(4)
+        //     this.mapLine1 = ``
+        //     this.mapLine2 = ``
+        // }).setFps(4)
 
         // Update player visited rooms
-        register("tick", () => {
-            if (!Dungeon.inDungeon || !this.players.length || !Dungeon.time || Dungeon.bossEntry) return
-            for (let p of this.players) {
-                let currentRoom = this.getPlayerRoom(p)
-                if (!currentRoom) continue
+        // register("tick", () => {
+        //     if (!Dungeon.inDungeon || !this.players.length || !Dungeon.time || Dungeon.bossEntry) return
+        //     for (let p of this.players) {
+        //         let currentRoom = this.getPlayerRoom(p)
+        //         if (!currentRoom) continue
 
-                // Room enter/exit event
-                if (currentRoom !== p.lastRoom) {
-                    if (p.lastRoom) this.playerRoomExitListeners.forEach(func => func(p, p.lastRoom))
-                    this.playerRoomEnterListeners.forEach(func => func(p, currentRoom))
-                }
-                if (!p.visitedRooms.has(currentRoom)) p.visitedRooms.set(currentRoom, 0)
-                if (p.lastRoomCheck) p.visitedRooms.set(currentRoom, p.visitedRooms.get(currentRoom) + Date.now() - p.lastRoomCheck)
-                p.lastRoomCheck = Date.now()
-                p.lastRoom = currentRoom
-            }
-        })
+        //         // Room enter/exit event
+        //         if (currentRoom !== p.lastRoom) {
+        //             if (p.lastRoom) this.playerRoomExitListeners.forEach(func => func(p, p.lastRoom))
+        //             this.playerRoomEnterListeners.forEach(func => func(p, currentRoom))
+        //         }
+        //         if (!p.visitedRooms.has(currentRoom)) p.visitedRooms.set(currentRoom, 0)
+        //         if (p.lastRoomCheck) p.visitedRooms.set(currentRoom, p.visitedRooms.get(currentRoom) + Date.now() - p.lastRoomCheck)
+        //         p.lastRoomCheck = Date.now()
+        //         p.lastRoom = currentRoom
+        //     }
+        // })
 
         const printPlayerStats = () => this.players.forEach(p => p.printClearStats())
 
@@ -115,18 +115,6 @@ export default new class DmapDungeon {
         }).setCriteria(/^ ☠ (\w+) .+$/)
 
         register("worldUnload", () => this.reset())
-
-        register("command", () => {
-            this.dungeonMap.rooms.forEach(r => {
-                ChatLib.chat(r.toString())
-            })
-        }).setName("/rooms")
-
-        register("command", () => {
-            this.dungeonMap.doors.forEach(r => {
-                ChatLib.chat(r.toString())
-            })
-        }).setName("/doors")
 
         register("chat", (keyType) => {
             if (keyType == "Wither") this.witherKeys++

@@ -120,27 +120,6 @@ class Settings {
         this.ragDisplayGui.open()
     };
 
-    // Reaper
-
-    @SwitchProperty({
-        name: "Reaper Display",
-        description: "Shows time left on reaper armor ability",
-        category: "General",
-        subcategory: "Reaper Display"
-    })
-    reaperDisplay = false;
-
-    @ButtonProperty({
-        name: "Move Reaper Display",
-        description: "Scroll to change scale, middle click to reset",
-        category: "General",
-        subcategory: "Reaper Display",
-        placeholder: "Move"
-    })
-    MoveReaperDisplayGui() {
-        this.reaperDisplayGui.open()
-    };
-
     // Pests
 
     @SwitchProperty({

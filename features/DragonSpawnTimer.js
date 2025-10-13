@@ -1,88 +1,92 @@
 import config from "../config"
 import { data } from "../util/data"
+import { getClass, S32PacketConfirmTransaction, S2APacketParticles } from "../util/util"
 import { registerWhen } from "../../BloomCore/utils/Utils"
-import { getClass, S32PacketConfirmTransaction } from "../util/util"
 
-let inP5 = false
-let ticks = 0
-let redSpawning = false
-let orangeSpawning = false
-let blueSpawning = false
-let purpleSpawning = false
-let greenSpawning = false
-let drags = [null, null]
+let ticks = 0;
+let redSpawning = false;
+let orangeSpawning = false;
+let blueSpawning = false;
+let purpleSpawning = false;
+let greenSpawning = false;
+let drags = [null, null];
 
-let timeText = new Text('').setScale(3).setShadow(true).setAlign('CENTER')
+let timeText = new Text('').setScale(3).setShadow(true).setAlign('CENTER');
 
-register("packetReceived", (packet) => {
-    if (!config.dragonSpawnTimer) return
-    if (inP5 && packet.func_179749_a().toString() == "ENCHANTMENT_TABLE") {
-        handleParticles(parseInt(packet.func_149220_d()), parseInt(packet.func_149226_e()), parseInt(packet.func_149225_f()))
+const particleListener = register("packetReceived", (packet) => {
+    if (packet.func_179749_a().toString() == "ENCHANTMENT_TABLE") {
+        handleParticles(parseInt(packet.func_149220_d()), parseInt(packet.func_149226_e()), parseInt(packet.func_149225_f()));
     }
-}).setFilteredClass(net.minecraft.network.play.server.S2APacketParticles)
+}).setFilteredClass(S2APacketParticles).unregister();
 
 const tickCounter = register("packetReceived", () => {
-    ticks--
-    if (ticks <= 0) {
-        redSpawning = false
-        orangeSpawning = false
-        blueSpawning = false
-        purpleSpawning = false
-        greenSpawning = false
-        tickCounter.unregister()
+    display.register();
+    if (--ticks <= 0) {
+        redSpawning = false;
+        orangeSpawning = false;
+        blueSpawning = false;
+        greenSpawning = false;
+        purpleSpawning = false;
+        tickCounter.unregister();
+        display.unregister();
     }
-}).setFilteredClass(S32PacketConfirmTransaction).unregister()
+}).setFilteredClass(S32PacketConfirmTransaction).unregister();
 
-registerWhen(register("renderOverlay", () => {
+const display = register("renderOverlay", () => {
     let timeLeft = (ticks / 20).toFixed(2)
 
     timeText.setString(timeLeft)
     timeText.setScale(data.dragonSpawnTimer.scale)
     timeText.draw(data.dragonSpawnTimer.x, data.dragonSpawnTimer.y)
-}), () => config.dragonSpawnTimer && ticks > 0)
+}).unregister();
 
 register("worldLoad", () => {
     inP5 = false
-    ticks = 0
-    redSpawning = false
-    orangeSpawning = false
-    blueSpawning = false
-    purpleSpawning = false
-    greenSpawning = false
-    tickCounter.unregister()
-    drags = [null, null]
+    ticks = 0;
+    redSpawning = false;
+    orangeSpawning = false;
+    blueSpawning = false;
+    purpleSpawning = false;
+    greenSpawning = false;
+    tickCounter.unregister();
+    drags = [null, null];
 })
 
 register("chat", () => {
-    inP5 = true
+    particleListener.register();
 }).setCriteria("[BOSS] Necron: All this, for nothing...")
 
-registerWhen(register("renderOverlay", () => {
+const exampleHud = register("renderOverlay", () => {
     timeText.setString("5.00")
     timeText.setScale(data.dragonSpawnTimer.scale)
     timeText.draw(data.dragonSpawnTimer.x, data.dragonSpawnTimer.y)
-}), () => config.dragonSpawnTimerGui.isOpen())
+}).unregister();
 
 registerWhen(register("dragged", (dx, dy, x, y, bn) => {
-    if (bn == 2) return
-    data.dragonSpawnTimer.x = x
-    data.dragonSpawnTimer.y = y
-    data.save()
+    const checkClose = register("GuiClosed", () => {
+        checkClose.unregister();
+        exampleHud.unregister();
+    })
+    exampleHud.register();
+    if (bn == 2) return;
+    data.dragonSpawnTimer.x = x;
+    data.dragonSpawnTimer.y = y;
+    data.save();
 }), () => config.dragonSpawnTimerGui.isOpen())
 
 register("scrolled", (x, y, dir) => {
-    if (!config.dragonSpawnTimerGui.isOpen()) return
-    if (dir == 1) data.dragonSpawnTimer.scale += 0.05
-    else data.dragonSpawnTimer.scale -= 0.05
-    data.save()
+    if (!config.dragonSpawnTimerGui.isOpen()) return;
+    if (dir == 1) data.dragonSpawnTimer.scale += 0.05;
+    else data.dragonSpawnTimer.scale -= 0.05;
+    data.save();
 })
 
 register("guiMouseClick", (x, y, bn) => {
-    if (!config.dragonSpawnTimerGui.isOpen() || bn != 2) return
-    data.dragonSpawnTimer.x = Renderer.screen.getWidth() / 2
-    data.dragonSpawnTimer.y = Renderer.screen.getHeight() / 2 + 40
-    data.dragonSpawnTimer.scale = 3
-    data.save()
+    if (!config.dragonSpawnTimerGui.isOpen() || bn != 2) return;
+    data.dragonSpawnTimer.x = Renderer.screen.getWidth() / 2;
+    data.dragonSpawnTimer.y = Renderer.screen.getHeight() / 2 + 40;
+    data.dragonSpawnTimer.scale = 3;
+    data.save();
 })
 
 const dragInfo = {
@@ -95,13 +99,13 @@ const dragInfo = {
 
 function assignColor(drag) {
     if (!drags[0]) {
-        drags[0] = drag
+        drags[0] = drag;
     } else if (!drags[1] && drag != drags[0]) {
-        drags[1] = drag
-        determinePrio()
+        drags[1] = drag;
+        determinePrio();
     } else {
         // change the color of timeText
-        timeText.setColor(drag.color)
+        timeText.setColor(drag.color);
     }
 }
 
@@ -109,21 +113,21 @@ function assignColor(drag) {
 function determinePrio() {
     if (getClass() == "Archer" || getClass() == "Tank") {
         if (drags[0].prio[0] < drags[1].prio[0]) {
-            timeText.setColor(drags[0].color)
+            timeText.setColor(drags[0].color);
         } else {
-            timeText.setColor(drags[1].color)
+            timeText.setColor(drags[1].color);
         }
     } else if (getClass() == "Berserk" || getClass() == "Mage" || (getClass() == "Healer" && config.healerTeam == 1)) {
         if (drags[0].prio[0] > drags[1].prio[0]) {
-            timeText.setColor(drags[0].color)
+            timeText.setColor(drags[0].color);
         } else {
-            timeText.setColor(drags[1].color)
+            timeText.setColor(drags[1].color);
         }
     } else if (getClass() == "Healer" && config.healerTeam == 0) {
         if (drags[0].prio[1] < drags[1].prio[1]) {
-            timeText.setColor(drags[0].color)
+            timeText.setColor(drags[0].color);
         } else {
-            timeText.setColor(drags[1].color)
+            timeText.setColor(drags[1].color);
         }
     }
 }
@@ -136,18 +140,18 @@ function handleParticles(x, y, z) {
             // check if red
             if (z == 59) {
                 if (!redSpawning) {
-                    assignColor(dragInfo.red)
-                    ticks = 100
-                    tickCounter.register()
-                    redSpawning = true
+                    assignColor(dragInfo.red);
+                    ticks = 100;
+                    tickCounter.register();
+                    redSpawning = true;
                 }
             // check if green
             } else if (z == 94) {
                 if (!greenSpawning) {
-                    assignColor(dragInfo.green)
-                    ticks = 100
-                    tickCounter.register()
-                    greenSpawning = true
+                    assignColor(dragInfo.green);
+                    ticks = 100;
+                    tickCounter.register();
+                    greenSpawning = true;
                 }
             }
         // check if blue/orange
@@ -155,27 +159,27 @@ function handleParticles(x, y, z) {
             // check if blue
             if (z == 94) {
                 if (!blueSpawning) {
-                    assignColor(dragInfo.blue)
-                    ticks = 100
-                    tickCounter.register()
-                    blueSpawning = true
+                    assignColor(dragInfo.blue);
+                    ticks = 100;
+                    tickCounter.register();
+                    blueSpawning = true;
                 }
             // check if orange
             } else if (z == 56) {
                 if (!orangeSpawning) {
-                    assignColor(dragInfo.orange)
-                    ticks = 100
-                    tickCounter.register()
-                    orangeSpawning = true
+                    assignColor(dragInfo.orange);
+                    ticks = 100;
+                    tickCounter.register();
+                    orangeSpawning = true;
                 }
             }
         // check if purple    
         } else if (x == 56) {
             if (!purpleSpawning) {
-                assignColor(dragInfo.purple)
-                ticks = 100
-                tickCounter.register()
-                purpleSpawning = true
+                assignColor(dragInfo.purple);
+                ticks = 100;
+                tickCounter.register();
+                purpleSpawning = true;
             }
         }
     }

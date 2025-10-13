@@ -2,23 +2,25 @@ import config from "../config"
 import { data } from "../util/data" 
 import { getClass, getDistance } from "../util/util"
 
-let enterBoss
-let at3Dev = false
-let counting = false
+let enterBoss;
+let at3Dev = false;
+let counting = false;
 
 register("chat", () => {
-    if (getClass() != "Healer" || !config.predevTimer) return
-    enterBoss = Date.now()
-    counting = true
+    if (getClass() != "Healer" || !config.predevTimer) return;
+    enterBoss = Date.now();
+    counting = true;
+    finishListener.register();
 }).setCriteria("[BOSS] Maxor: WELL! WELL! WELL! LOOK WHO'S HERE!")
 
-register("tick", () => {
+const finishListener = register("tick", () => {
     if (getClass() != "Healer" || !config.predevTimer || !counting) return
     if (!at3Dev && getDistance(Player.getX(), Player.getZ(), 1, 77) <= 3) {
         at3Dev = true
+        finishListener.unregister();
         return
     }
-})
+}).unregister();
 
 register("chat", () => {
     if (getClass() != "Healer" || !config.predevTimer || !counting) return
@@ -41,4 +43,5 @@ register("chat", () => {
 register("worldLoad", () => {
     at3Dev = false
     counting = false
+    finishListener.unregister();
 })

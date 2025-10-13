@@ -1,11 +1,12 @@
 import Dungeon from "../../BloomCore/dungeons/Dungeon"
-import { registerWhen } from "../../BloomCore/utils/Utils"
 import config from "../config"
 import { data } from "../util/data"
+import { bossMessages } from "../util/util"
+import { registerWhen } from "../../BloomCore/utils/Utils"
 
-let text = new Text('').setScale(3).setShadow(true).setAlign('CENTER')
-let playersLeaped = []
-let p5Started = false
+let text = new Text('').setScale(3).setShadow(true).setAlign('CENTER');
+let playersLeaped = [];
+let p5Started = false;
 
 const sectionRegions = [
     [90, 111, 106, 145, 50, 123],
@@ -25,101 +26,111 @@ const eeSpots = {
 }
 
 function inBox(player, region) {
-    let [x, y, z] = [player.getRenderX(), player.getRenderY(), player.getRenderZ()]
-    if (x >= region[0] && x <= region[1] && y >= region[2] && y <= region[3] && z >= region[4] && z <= region[5]) return true
-    return false
+    let [x, y, z] = [player.getRenderX(), player.getRenderY(), player.getRenderZ()];
+    if (x >= region[0] && x <= region[1] && y >= region[2] && y <= region[3] && z >= region[4] && z <= region[5]) return true;
+    return false;
 }
 
 function getSection(player) {
-    if (!player) return 0
+    if (!player) return 0;
 
     for (let i = 0; i < 5; ++i) {
-        if (inBox(player, sectionRegions[i])) return i + 1
+        if (inBox(player, sectionRegions[i])) return i + 1;
     }
-    return 0
+    return 0;
 }
 
 function leapListener(section) {
     for (let p of Dungeon.party) {
-        if (p == Player.getName()) continue
-        let player = World.getPlayerByName(p)
-        if (!player) continue
+        if (p == Player.getName()) continue;
+        let player = World.getPlayerByName(p);
+        if (!player) continue;
         if (getSection(player) == section) {
-            if (!playersLeaped.includes(p)) playersLeaped.push(p)
+            if (!playersLeaped.includes(p)) playersLeaped.push(p);
         }
     }
 }
 
 function eeSpot() {
-    if (inRange(eeSpots.ee2)) return 2
-    else if (inRange(eeSpots.ee3)) return 3
-    else if (inRange(eeSpots.core)) return 4
-    else if (inRange(eeSpots.relic) && !p5Started) return 5
-    else return 0
+    if (inRange(eeSpots.ee2)) return 2;
+    else if (inRange(eeSpots.ee3)) return 3;
+    else if (inRange(eeSpots.core)) return 4;
+    else if (inRange(eeSpots.relic) && !p5Started) return 5;
+    else return 0;
 }
 
 function inRange(spot) {
-    let [x, y, z] = [Player.getX(), Player.getY(), Player.getZ()]
-    let distX = Math.abs(spot.x - x)
-    let distY = Math.abs(spot.y - y)
-    let distZ = Math.abs(spot.z - z)
-    if (distX < spot.r && distY < 2 && distZ < spot.r) return true
-    return false
+    let [x, y, z] = [Player.getX(), Player.getY(), Player.getZ()];
+    let distX = Math.abs(spot.x - x);
+    let distY = Math.abs(spot.y - y);
+    let distZ = Math.abs(spot.z - z);
+    if (distX < spot.r && distY < 2 && distZ < spot.r) return true;
+    return false;
 }
 
 register("chat", () => {
-    p5Started = true
+    p5Started = true;
 }).setCriteria("[BOSS] Necron: All this, for nothing...")
 
 register("worldLoad", () => {
-    p5Started = false
+    p5Started = false;
+    locationListener.unregister();
+    display.unregister();
 })
 
-register("tick", () => {
-    if (!config.leapNotification) return
-    if (!Dungeon.inDungeon) return
-    if (eeSpot() > 0) {
-        leapListener(eeSpot())
-    } else {
-        playersLeaped = []
-    }
-})
+register("chat", (message) => {
+    if (bossMessages.includes(message)) locationListener.register();
+}).setCriteria("${message}")
 
-register("renderOverlay", () => {
+const locationListener = register("tick", () => {
     if (!config.leapNotification) return;
+    if (eeSpot() > 0) {
+        leapListener(eeSpot());
+        display.register();
+    } else {
+        playersLeaped = [];
+        display.unregister();
+    }
+}).unregister();
 
-    if (!Dungeon.inDungeon) return
-    if (!eeSpot()) return
-    if (eeSpot() == 3) text.setString(`${playersLeaped.length > 2 ? "&9" : "&4"}${playersLeaped.length}&9/3 Players Leaped`)
-    else text.setString(`${playersLeaped.length > 3 ? "&9" : "&4"}${playersLeaped.length}&9/4 Players Leaped`)
-    text.setScale(data.leapNotification.scale)
-    text.draw(data.leapNotification.x, data.leapNotification.y)
-})
+const display = register("renderOverlay", () => {
+    if (!config.leapNotification) return;
+    if (eeSpot() == 3) text.setString(`${playersLeaped.length > 2 ? "&9" : "&4"}${playersLeaped.length}&9/3 Players Leaped`);
+    else text.setString(`${playersLeaped.length > 3 ? "&9" : "&4"}${playersLeaped.length}&9/4 Players Leaped`);
+    
+    text.setScale(data.leapNotification.scale);
+    text.draw(data.leapNotification.x, data.leapNotification.y);
+}).unregister();
 
-registerWhen(register("renderOverlay", () => {
-    text.setString(`&94/4 Players Leaped`)
-    text.setScale(data.leapNotification.scale)
-    text.draw(data.leapNotification.x, data.leapNotification.y)
-}), () => config.leapNotificationGui.isOpen())
+const exampleHud = register("renderOverlay", () => {
+    text.setString(`&94/4 Players Leaped`);
+    text.setScale(data.leapNotification.scale);
+    text.draw(data.leapNotification.x, data.leapNotification.y);
+}).unregister();
 
 registerWhen(register("dragged", (dx, dy, x, y, bn) => {
-    if (bn == 2) return
-    data.leapNotification.x = x
-    data.leapNotification.y = y
-    data.save()
+    const checkClose = register("GuiClosed", () => {
+        checkClose.unregister();
+        exampleHud.unregister();
+    })
+    exampleHud.register();
+    if (bn == 2) return;
+    data.leapNotification.x = x;
+    data.leapNotification.y = y;
+    data.save();
 }), () => config.leapNotificationGui.isOpen())
 
 register("scrolled", (x, y, dir) => {
-    if (!config.leapNotificationGui.isOpen()) return
-    if (dir == 1) data.leapNotification.scale += 0.05
-    else data.leapNotification.scale -= 0.05
-    data.save()
+    if (!config.leapNotificationGui.isOpen()) return;
+    if (dir == 1) data.leapNotification.scale += 0.05;
+    else data.leapNotification.scale -= 0.05;
+    data.save();
 })
 
 register("guiMouseClick", (x, y, bn) => {
-    if (!config.leapNotificationGui.isOpen() || bn != 2) return
-    data.leapNotification.x = Renderer.screen.getWidth() / 2
-    data.leapNotification.y = Renderer.screen.getHeight() / 2 - 200
-    data.leapNotification.scale = 3
-    data.save()
+    if (!config.leapNotificationGui.isOpen() || bn != 2) return;
+    data.leapNotification.x = Renderer.screen.getWidth() / 2;
+    data.leapNotification.y = Renderer.screen.getHeight() / 2 - 200;
+    data.leapNotification.scale = 3;
+    data.save();
 })

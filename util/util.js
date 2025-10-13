@@ -8,6 +8,7 @@ export const MouseEvent = Java.type("net.minecraftforge.client.event.MouseEvent"
 
 export const S32PacketConfirmTransaction = Java.type("net.minecraft.network.play.server.S32PacketConfirmTransaction")
 export const C09PacketHeldItemChange = Java.type("net.minecraft.network.play.client.C09PacketHeldItemChange")
+export const S2APacketParticles = Java.type("net.minecraft.network.play.server.S2APacketParticles")
 
 export const RenderUtils = Java.type("me.odinmain.utils.render.RenderUtils");
 export const ColorUtils = Java.type("me.odinmain.utils.render.Color");
@@ -16,6 +17,10 @@ export const javaColor = Java.type("java.awt.Color")
 export const Vec3 = Java.type("net.minecraft.util.Vec3")
 
 export const START_MSG = "[NPC] Mort: Here, I found this map when I first entered the dungeon.";
+export const skullOwner = ["4c95c9e0-bfdc-3d28-8103-292523e20c43", "43aab0f2-c709-370f-9035-2b4fe27b8a07", "14a579e7-d36c-3f5c-9c2b-1051d4691df3", "e67afce3-2a07-3cd1-b18d-9adc9ef7823f", "a596d89d-1d83-37a9-a4d1-e3c67e842635", "7e1cdb5f-a951-3913-bcb1-74cbd6221897", "cd56ef4f-6b7a-3c75-a165-b227e1dbc84f"];
+export const bloodMessages = ["[BOSS] The Watcher: Ah, you've finally arrived.", "[BOSS] The Watcher: Ah, we meet again...", "[BOSS] The Watcher: So you made it this far... interesting.", "[BOSS] The Watcher: You've managed to scratch and claw your way here, eh?", "[BOSS] The Watcher: I'm starting to get tired of seeing you around here...", "[BOSS] The Watcher: Oh... hello?", "[BOSS] The Watcher: Things feel a little more roomy now, eh?"];
+export const bossMessages = ["[BOSS] Bonzo: Gratz for making it this far, but I'm basically unbeatable.", "[BOSS] Scarf: This is where the journey ends for you, Adventurers.", "[BOSS] The Professor: I was burdened with terrible news recently...", "[BOSS] Thorn: Welcome Adventurers! I am Thorn, the Spirit! And host of the Vegan Trials!", "[BOSS] Livid: Welcome, you've arrived right on time. I am Livid, the Master of Shadows.", "[BOSS] Sadan: So you made it all the way here... Now you wish to defy me? Sadan?!", "[BOSS] Maxor: WELL! WELL! WELL! LOOK WHO'S HERE!"];
+export const RUN_END_CRITERIA = /^\s*☠ Defeated (.+) in 0?([\dhms ]+?)\s*(\(NEW RECORD!\))?$/
 
 export const removeUnicode = (string) => typeof(string) !== "string" ? "" : string.replace(/[^\u0000-\u007F]/g, "")
 

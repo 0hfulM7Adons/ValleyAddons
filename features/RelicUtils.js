@@ -17,13 +17,12 @@ register("chat", (name, relicPicked) => {
 
     rcListener.register();
     lcListener.register();
+    highlight.register();
 }).setCriteria(/(\w+) picked the Corrupted (\w+) Relic!/)
 
-register("renderWorld", () => {
-    if (!config.highlightCauldron) return;
-    if (!relic) return
-    drawHighlight(relic)
-})
+const highlight = register("renderWorld", () => {
+    drawHighlight(relic);
+}).unregister();
 
 register(MouseEvent, (event) => {
     if (!relic || !config.blockRelicClicks) return
@@ -57,6 +56,7 @@ const rcListener = register('playerInteract', (action, pos) => {
     relic = null;
     rcListener.unregister();
     lcListener.unregister();
+    highlight.unregister();
 }).unregister()
 
 const lcListener = register('hitBlock', (block) => {
@@ -68,6 +68,7 @@ const lcListener = register('hitBlock', (block) => {
     relic = null;
     rcListener.unregister();
     lcListener.unregister();
+    highlight.unregister();
 }).unregister()
 
 // returns T or F

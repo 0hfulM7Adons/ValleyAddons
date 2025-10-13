@@ -7,14 +7,13 @@ let spawnTicks = 0;
 let pickedRelic
 let relic
 let spawned
-let scanning = false
 let r, g, p, o, b
 let times = {}
 
 register("chat", () => {
     if (!config.relicTimer) return
     p5Started = Date.now()
-    scanning = true
+    scanForRelic.register();
 
     spawnTicks = 0;
     tickCounter.register();
@@ -98,61 +97,62 @@ function relicMessage() {
     lcListener.unregister()
 }
 
-register("tick", () => {
-    if (!scanning) return
+const scanForRelic = register("tick", () => {
     let entities = World.getAllEntitiesOfType(ArmorStand);
     for (let e of entities) {
         if (new EntityLivingBase(e?.getEntity()).getItemInSlot(4)?.getNBT()?.toString()?.includes("Relic")) {
-            spawned = Date.now()
+            spawned = Date.now();
             tickCounter.unregister();
-            scanning = false
+            scanForRelic.unregister();
+            allRelicsPlaced.register();
         }
     }
-})
+}).unregister();
 
-register("tick", () => {
-    if (!config.showEveryRelic || !p5Started) return
-    let entities = World.getAllEntitiesOfType(ArmorStand)
+const allRelicsPlaced = register("tick", () => {
+    if (!config.showEveryRelic) return;
+    let entities = World.getAllEntitiesOfType(ArmorStand);
     for (let e of entities) {
         if (new EntityLivingBase(e?.getEntity()).getItemInSlot(4)?.getNBT()?.toString()?.includes("Relic")) {
-            let x = e.getX()
-            let z = e.getZ()
+            let x = e.getX();
+            let z = e.getZ();
             if (!r && getDistance(x, z, 52, 43) < 1) {
                 // red
-                r = ((Date.now() - p5Started) / 1000).toFixed(3)
-                times["&cRed"] = r
+                r = ((Date.now() - p5Started) / 1000).toFixed(3);
+                times["&cRed"] = r;
             }
             if (!g && getDistance(x, z, 50, 45) < 1) {
                 // green
-                g = ((Date.now() - p5Started) / 1000).toFixed(3)
-                times["&aGreen"] = g
+                g = ((Date.now() - p5Started) / 1000).toFixed(3);
+                times["&aGreen"] = g;
             }
             if (!p && getDistance(x, z, 55, 42) < 1) {
                 // purple
-                p = ((Date.now() - p5Started) / 1000).toFixed(3)
-                times["&5Purple"] = p
+                p = ((Date.now() - p5Started) / 1000).toFixed(3);
+                times["&5Purple"] = p;
             }
             if (!o && getDistance(x, z, 58, 43) < 1) {
                 // orange
-                o = ((Date.now() - p5Started) / 1000).toFixed(3)
-                times["&6Orange"] = o
+                o = ((Date.now() - p5Started) / 1000).toFixed(3);
+                times["&6Orange"] = o;
             }
             if (!b && getDistance(x, z, 60, 45) < 1) {
                 // blue
-                b = ((Date.now() - p5Started) / 1000).toFixed(3)
-                times["&bBlue"] = b
+                b = ((Date.now() - p5Started) / 1000).toFixed(3);
+                times["&bBlue"] = b;
             }
         }
     }
 
     if (r && g && p && o && b) {
         for (let t in times) {
-            ChatLib.chat(`${config.customPrefix} ${t} &aRelic placed in &e${times[t]}s&a.`)
+            ChatLib.chat(`${config.customPrefix} ${t} &aRelic placed in &e${times[t]}s&a.`);
         }
-        p5Started = null
+        p5Started = null;
+        allRelicsPlaced.unregister();
     }
 
-})
+}).unregister();
 
 register("worldLoad", () => {
     p5Started = null

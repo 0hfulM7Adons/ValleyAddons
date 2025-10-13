@@ -322,11 +322,11 @@ const rgb = () => {
     }
 }
 
-register("step", () => {
-    const d = Date.now()
-    rgb()
-    lastRgb = d
-})
+// register("step", () => {
+//     const d = Date.now()
+//     rgb()
+//     lastRgb = d
+// })
 
 export const getRgb = () => [red, green, blue]
 

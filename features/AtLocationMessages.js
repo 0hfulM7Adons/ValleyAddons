@@ -1,45 +1,49 @@
 import config from '../config'
-import { registerWhen } from "../../BloomCore/utils/Utils"
 
-let text = new Text('').setScale(2).setShadow(true).setAlign('CENTER').setColor(Renderer.YELLOW)
-let startTime
-let name
-let action
-let place
-let timesPlayed = 0
+let text = new Text('').setScale(2).setShadow(true).setAlign('CENTER').setColor(Renderer.YELLOW);
+let name;
+let action;
+let place;
+let timesPlayed = 0;
+let timesToPlay = 0;
 
 register("chat", (n, a, p) => {
-    if (!config.locationNotif) return
-    name = n
-    action = a
-    place = p
-    startTime = Date.now()
-    timesPlayed = 0
+    if (!config.locationNotif) return;
+    name = n;
+    action = a;
+    place = p;
+    timesPlayed = 0;
+    timesToPlay = parseInt(config.locationNotifRepeatAmount);
 
-    if (p.toLowerCase().includes("ss")) messagesSent.ss[0] = true
-    if (p.toLowerCase().includes("ee2")) messagesSent.ee2[0] = true
-    if (p.toLowerCase().includes("high ee2")) messagesSent.highee2[0] = true
-    if (p.toLowerCase().includes("ee3")) messagesSent.ee3[0] = true
-    if (p.toLowerCase().includes("core")) messagesSent.core[0] = true
-    if (p.toLowerCase().includes("goldor tunnel")) messagesSent.tunnel[0] = true
-    if (p.toLowerCase().includes("2 safespot")) messagesSent.safespot2[0] = true
-    if (p.toLowerCase().includes("3 safespot")) messagesSent.safespot3[0] = true
+    if (p.toLowerCase().includes("ss")) messagesSent.ss[0] = true;
+    if (p.toLowerCase().includes("ee2")) messagesSent.ee2[0] = true;
+    if (p.toLowerCase().includes("high ee2")) messagesSent.highee2[0] = true;
+    if (p.toLowerCase().includes("ee3")) messagesSent.ee3[0] = true;
+    if (p.toLowerCase().includes("core")) messagesSent.core[0] = true;
+    if (p.toLowerCase().includes("goldor tunnel")) messagesSent.tunnel[0] = true;
+    if (p.toLowerCase().includes("2 safespot")) messagesSent.safespot2[0] = true;
+    if (p.toLowerCase().includes("3 safespot")) messagesSent.safespot3[0] = true;
+
+    if (name == Player.getName()) return;
+
+    display.register();
+    soundLoop.register();
 }).setCriteria(/Party >.* (\w+): (At|Inside) (.+)/)
 
-registerWhen(register("renderOverlay", () => {
-    const remaining = (1500 - (Date.now() - startTime ?? 0))
-    if (remaining < 0) return
+const display = register("renderOverlay", () => {
+    text.setString(`${name} is ${action} ${place}!`);
+    text.draw(Renderer.screen.getWidth() / 2, Renderer.screen.getHeight() / 2 - 50);
+}).unregister();
 
-    text.setString(`${name} is ${action} ${place}!`)
-    text.draw(Renderer.screen.getWidth() / 2, Renderer.screen.getHeight() / 2 - 50)
-
-    let timesToPlay = parseInt(config.locationNotifRepeatAmount)
-    if (timesPlayed < timesToPlay) {
-        World.playSound(config.locationSound, 2, 2)
-        timesPlayed++
+const soundLoop = register("tick", () => {
+    if (timesPlayed >= timesToPlay) {
+        soundLoop.unregister();
+        display.unregister();
+        return;
     }
-
-}), () => config.locationNotif && startTime && name != Player.getName())
+    World.playSound(config.locationSound, 2, 2);
+    timesPlayed++;
+}).unregister();
 
 const inRange = (arr) => {
     let x = Player.getX()
@@ -51,17 +55,6 @@ const inRange = (arr) => {
                 return true
             }
         }
-    }
-    return false
-}
-
-const inRadius = (arr) => {
-    let x = Player.getX()
-    let y = Player.getY()
-    let z = Player.getZ()
-    if (y >= arr[2][0] && y <= arr[2][1]) {
-        let dist = Math.sqrt((x - arr[1]) ** 2 + (z - arr[3]) ** 2)
-        if (dist < arr[4]) return true
     }
     return false
 }
@@ -78,6 +71,7 @@ let messagesSent = {
 }
 
 register('chat', () => {
+    locationCheck.register();
     messagesSent.ss[0] = false
 }).setCriteria("[BOSS] Storm: I'd be happy to show you what that's like!")
 
@@ -101,7 +95,7 @@ register('chat', () => {
     messagesSent.safespot3[0] = true
 }).setCriteria("The Core entrance is opening!")
 
-register('tick', () => {
+const locationCheck = register('tick', () => {
     if (!messagesSent.ss[0] && config.ssCoord && inRange(messagesSent.ss)) {
         ChatLib.command('pc At SS!')
         messagesSent.ss[0] = true
@@ -149,10 +143,10 @@ register('tick', () => {
         messagesSent.safespot3[0] = true
         return
     }
-
-})
+}).unregister();
 
 register('worldLoad', () => {
+    locationCheck.unregister();
     messagesSent = {
         'ss': [true, [107, 110], [120, 121], [93, 95]],
         'ee2': [true, [57, 59], [109, 110], [130, 132]],

@@ -4,22 +4,22 @@ import { EntityPlayer } from "../util/util"
 let inBoss = false
 
 register("chat", () => {
-    inBoss = true
+    inBoss = true;
 }).setCriteria("[BOSS] Maxor: WELL! WELL! WELL! LOOK WHO'S HERE!")
 
 register("chat", () => {
     if (!config.hidePlayersAfterLeap) return
     if (config.onlyHideInBoss) {
         if (inBoss) {
-            hidePlayers.register()
+            hidePlayers.register();
             setTimeout(() => {
-                hidePlayers.unregister()
+                hidePlayers.unregister();
             }, 2000)
         }
     } else {
-        hidePlayers.register()
+        hidePlayers.register();
         setTimeout(() => {
-            hidePlayers.unregister()
+            hidePlayers.unregister();
         }, 2000)
     }
 }).setCriteria(/You have teleported to .+/)
@@ -31,8 +31,8 @@ const hidePlayers = register("renderEntity", (entity, pos, pt, event) => {
             cancel(event)
         }
     }
-}).unregister()
+}).unregister();
 
 register("worldLoad", () => {
-    hidePlayers.unregister()
+    hidePlayers.unregister();
 })
