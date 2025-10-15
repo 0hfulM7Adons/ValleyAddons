@@ -14,11 +14,11 @@ register("chat", (message) => {
 
 const display = register("renderOverlay", () => {
     if (!isPlayerInBox(...regions.p2)) return;
-    const dist = (75 - Player.getZ()).toFixed(3);
+    const dist = (Player.getX() - 33.704).toFixed(3);
     text.setString(dist);
     text.setScale(data.distanceToLedge.scale);
     text.draw(data.distanceToLedge.x, data.distanceToLedge.y);
-})
+}).unregister();
 
 register("worldLoad", () => {
     display.unregister();
