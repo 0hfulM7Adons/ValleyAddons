@@ -79,11 +79,11 @@ register("worldLoad", () => {
 })
 
 register("chat", (message) => {
+    if (!config.leapNotification) return;
     if (bossMessages.includes(message)) locationListener.register();
 }).setCriteria("${message}")
 
 const locationListener = register("tick", () => {
-    if (!config.leapNotification) return;
     if (eeSpot() > 0) {
         leapListener(eeSpot());
         display.register();
@@ -94,7 +94,6 @@ const locationListener = register("tick", () => {
 }).unregister();
 
 const display = register("renderOverlay", () => {
-    if (!config.leapNotification) return;
     if (eeSpot() == 3) text.setString(`${playersLeaped.length > 2 ? "&9" : "&4"}${playersLeaped.length}&9/3 Players Leaped`);
     else text.setString(`${playersLeaped.length > 3 ? "&9" : "&4"}${playersLeaped.length}&9/4 Players Leaped`);
     

@@ -8,7 +8,9 @@ let ticks = 0;
 let soundPlayed = false;
 let casted = false;
 
-const tickChecker = register("packetReceived", () => {
+const tickChecker = register("packetReceived", (packet, event) => {
+    if (packet.func_148890_d() > -1) return;
+
     if (--ticks <= 0) {
         tickChecker.unregister();
         display.unregister();
@@ -35,6 +37,7 @@ const actionBarListener = register("actionBar", (event) => {
 }).unregister();
 
 register("packetSent", (packet) => {
+    if (!config.ragDisplay) return;
     if (Player?.getHeldItem()?.getName()?.includes("Ragnarock")) {
         soundListener.register();
         actionBarListener.register();

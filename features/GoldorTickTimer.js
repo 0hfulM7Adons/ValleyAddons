@@ -7,6 +7,7 @@ let barrierTicks = 0
 let timeText = new Text('').setScale(2).setShadow(true).setAlign('CENTER').setColor(Renderer.GREEN)
 
 register("chat", () => {
+    if (!config.goldorTickTimer) return;
     if (!config.totalTermTime) barrierTicks = 60;
     tickCounter.register();
     display.register();
@@ -30,7 +31,9 @@ const display = register("renderOverlay", () => {
     timeText.draw(data.goldorTickTimer.x, data.goldorTickTimer.y);
 }).unregister();
 
-const tickCounter = register("packetReceived", () => {
+const tickCounter = register("packetReceived", (packet, event) => {
+    if (packet.func_148890_d() > -1) return;
+
     if (!config.totalTermTime) {
         if (--barrierTicks <= 0) barrierTicks = 60;
     } else {

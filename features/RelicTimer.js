@@ -28,7 +28,9 @@ register("chat", (name, relicPicked) => {
     lcListener.register()
 }).setCriteria(/(\w+) picked the Corrupted (\w+) Relic!/)
 
-const tickCounter = register("packetReceived", () => {
+const tickCounter = register("packetReceived", (packet, event) => {
+
+    if (packet.func_148890_d() > -1) return;
 
     spawnTicks++;
 

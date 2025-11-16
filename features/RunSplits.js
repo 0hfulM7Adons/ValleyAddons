@@ -17,7 +17,9 @@ let msgSent = false;
 let splitMsg = new Text("").setShadow(true).setAlign("RIGHT");
 let namesMsg = new Text("").setShadow(true);
 
-const tickChecker = register("packetReceived", () => {
+const tickChecker = register("packetReceived", (packet, event) => {
+    if (packet.func_148890_d() > -1) return;
+
     ticks++;
 }).setFilteredClass(S32PacketConfirmTransaction).unregister();
 

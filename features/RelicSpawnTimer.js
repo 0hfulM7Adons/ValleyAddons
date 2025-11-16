@@ -13,7 +13,9 @@ register("chat", () => {
     display.register();
 }).setCriteria("[BOSS] Necron: All this, for nothing...")
 
-const tickCounter = register("packetReceived", () => {
+const tickCounter = register("packetReceived", (packet, event) => {
+    if (packet.func_148890_d() > -1) return;
+
     if (--ticks <= 0) {
         tickCounter.unregister()
         display.unregister();

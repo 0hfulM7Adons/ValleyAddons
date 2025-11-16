@@ -4,8 +4,9 @@ export const refillCommand = register("command", () => {
 
     const pearlStack = Player.getInventory().getItems().find(a => a?.getName() == "§fEnder Pearl");
     const jerryStack = Player.getInventory().getItems().find(a => a?.getName() == "§fInflatable Jerry");
+    const tntStack = Player.getInventory().getItems().find(a => a?.getName() == "§9Superboom TNT")
 
-    ChatLib.chat(`${config.customPrefix} &aRefilling Pearls and Jerries!`);
+    ChatLib.chat(`${config.customPrefix} &aRefilling Pearls, Jerries, and TNT!`);
 
     let delay = 2000;
 
@@ -13,20 +14,24 @@ export const refillCommand = register("command", () => {
         ChatLib.command(`gfs ender_pearl 16`);
     } else {
         const toGive = 16 - pearlStack.getStackSize();
-        if (toGive == 0) {
-            delay = 0;
-        } else {
-            ChatLib.command(`gfs ender_pearl ${toGive}`);
-        }
+        if (toGive > 0) ChatLib.command(`gfs ender_pearl ${toGive}`);
     }
     setTimeout(() => {
         if (!jerryStack) {
             ChatLib.command(`gfs inflatable_jerry 64`);
         } else {
             const toGive = 64 - jerryStack.getStackSize();
-            ChatLib.command(`gfs inflatable_jerry ${toGive}`);
+            if (toGive > 0) ChatLib.command(`gfs inflatable_jerry ${toGive}`);
         }
     }, delay);
+    setTimeout(() => {
+        if (!tntStack) {
+            ChatLib.command(`gfs superboom_tnt 64`);
+        } else {
+            const toGive = 64 - tntStack.getStackSize();
+            if (toGive > 0) ChatLib.command(`gfs superboom_tnt ${toGive}`);
+        }
+    }, 2 * delay);
 
 }).setName("refill").setAliases(["fillmevalley", "fmv"])
 

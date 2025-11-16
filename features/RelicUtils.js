@@ -11,13 +11,16 @@ const relicCoords = {
 }
 
 register("chat", (name, relicPicked) => {
-    if (!config.highlightCauldron && !config.blockRelicClicks) return
-    if (name != Player.getName()) return
+    if (name != Player.getName()) return;
     relic = relicPicked
 
-    rcListener.register();
-    lcListener.register();
-    highlight.register();
+    if (config.blockRelicClicks) {
+        rcListener.register();
+        lcListener.register();
+    }
+    if (config.highlightCauldron) {
+        highlight.register();
+    }
 }).setCriteria(/(\w+) picked the Corrupted (\w+) Relic!/)
 
 const highlight = register("renderWorld", () => {

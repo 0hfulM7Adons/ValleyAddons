@@ -4,6 +4,7 @@ let text = new Text("&cMiniboss").setScale(3).setShadow(true)
 
 register("chat", (mini) => {
     if (!config.slayerMiniAlert) return
+    ChatLib.command("patcher sendcoords");
     text.setString(`&c${mini}`)
     notification.register()
     setTimeout(() => {

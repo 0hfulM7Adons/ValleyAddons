@@ -45,7 +45,9 @@ const timeDisplay = register("renderOverlay", () => {
     deathText.draw(data.padTickTimer.x, data.padTickTimer.y + 15 * data.padTickTimer.scale);
 }).unregister();
 
-const tickCounter = register("packetReceived", () => {
+const tickCounter = register("packetReceived", (packet, event) => {
+    if (packet.func_148890_d() > -1) return;
+
     ticks++;
 }).setFilteredClass(S32PacketConfirmTransaction).unregister();
 

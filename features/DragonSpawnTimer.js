@@ -19,7 +19,9 @@ const particleListener = register("packetReceived", (packet) => {
     }
 }).setFilteredClass(S2APacketParticles).unregister();
 
-const tickCounter = register("packetReceived", () => {
+const tickCounter = register("packetReceived", (packet, event) => {
+    if (packet.func_148890_d() > -1) return;
+    
     display.register();
     if (--ticks <= 0) {
         redSpawning = false;
@@ -53,6 +55,7 @@ register("worldLoad", () => {
 })
 
 register("chat", () => {
+    if (!config.dragonSpawnTimer) return;
     particleListener.register();
 }).setCriteria("[BOSS] Necron: All this, for nothing...")
 

@@ -6,7 +6,9 @@ import { registerWhen } from "../../BloomCore/utils/Utils"
 let timeText = new Text('').setScale(1).setShadow(true).setAlign('CENTER').setColor(Renderer.YELLOW);
 let ticks = 0;
 
-const tickCounter = register("packetReceived", () => {
+const tickCounter = register("packetReceived", (packet, event) => {
+    if (packet.func_148890_d() > -1) return;
+
     if (--ticks <= 0) {
         tickCounter.unregister();
         display.unregister();

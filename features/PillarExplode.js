@@ -15,7 +15,9 @@ register("chat", (message) => {
     }
 }).setCriteria("${message}")
 
-const tickCounter = register("packetReceived", () => {
+const tickCounter = register("packetReceived", (packet, event) => {
+    if (packet.func_148890_d() > -1) return;
+
     if (--ticks <= 0) {
         tickCounter.unregister();
         display.unregister();

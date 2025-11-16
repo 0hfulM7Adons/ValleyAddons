@@ -7,6 +7,7 @@ let startTime
 let onCooldown = false
 
 register("chat", () => {
+    if (!config.dungeonWarpCooldown) return;
     if (!onCooldown) {
         startTime = Date.now();
         onCooldown = true;
