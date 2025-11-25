@@ -13,3 +13,13 @@ export const sound = register("command", (...args) => {
     }
     
 }).setName("sound")
+
+const subtitles = register("soundPlay", (pos, name, vol, pitch, event) => {
+    ChatLib.chat(`name: ${name}, vol: ${vol}, pitch: ${pitch}`);
+}).unregister();
+
+let on = false;
+register("command", () => {
+    on ? subtitles.unregister() : subtitles.register();
+    on = !on;
+}).setName("subtitles")

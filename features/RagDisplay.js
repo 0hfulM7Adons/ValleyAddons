@@ -5,55 +5,29 @@ import { registerWhen } from "../../BloomCore/utils/Utils"
 
 let text = new Text("").setScale(1).setShadow(true).setAlign("CENTER").setColor(Renderer.YELLOW);
 let ticks = 0;
-let soundPlayed = false;
-let casted = false;
 
-const tickChecker = register("packetReceived", (packet, event) => {
+register("soundPlay", (pos, name, vol, pitch) => {
+    if (!config.ragDisplay) return;
+    if (vol != 1 && pitch != 1.4920635223388672) return;
+    if (!Player?.getHeldItem()?.getName()?.includes("Ragnarock")) return;
+    tickCounter.register();
+    display.register();
+    ticks = 200;
+}).setCriteria("mob.wolf.howl")
+
+const tickCounter = register("packetReceived", (packet) => {
     if (packet.func_148890_d() > -1) return;
 
     if (--ticks <= 0) {
-        tickChecker.unregister();
+        tickCounter.unregister();
         display.unregister();
-        return;
     }
-    if (ticks < 140) {
-        casted = false;
-        soundPlayed = false;
-    }
-}).setFilteredClass(S32PacketConfirmTransaction).unregister();
-
-const soundListener = register("soundPlay", () => {
-    soundPlayed = true;
-}).setCriteria("mob.wolf.howl").unregister();
-
-const actionBarListener = register("actionBar", (event) => {
-    let msg = ChatLib.getChatMessage(event).removeFormatting();
-    if (msg.includes("CASTING") && !msg.includes("CASTING IN") && !casted) {
-        casted = true;
-        ticks = 200;
-        tickChecker.register();
-        display.register();
-    }
-}).unregister();
-
-register("packetSent", (packet) => {
-    if (!config.ragDisplay) return;
-    if (Player?.getHeldItem()?.getName()?.includes("Ragnarock")) {
-        soundListener.register();
-        actionBarListener.register();
-    } else {
-        soundListener.unregister();
-        actionBarListener.unregister();
-    }
-}).setFilteredClass(C09PacketHeldItemChange)
+}).setFilteredClass(S32PacketConfirmTransaction).unregister()
 
 register("worldLoad", () => {
     ticks = 0;
-    soundPlayed = false;
-    casted = false;
-    soundListener.unregister();
-    actionBarListener.unregister();
-    tickChecker.unregister();
+    tickCounter.unregister();
+    display.unregister();
 })
 
 const display = register("renderOverlay", () => {
